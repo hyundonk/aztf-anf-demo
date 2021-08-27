@@ -229,3 +229,14 @@ Latency - Random Read
 
 ![image-20210827110150785](README.assets/image-20210827110150785.png)
 
+
+
+## Summary
+
+Azure NetApp Files provides NFS volume option for Azure Virtual Machine with better latency, IOPS, bandwidth performance than managed disk with same provisioned size. (Note that this performance is not limited by the IOPS limitation impose by VM SKU Size!)
+
+
+
+## Reference
+
+1) https://github.com/louwrentius/fio-plot.git
