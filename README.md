@@ -37,7 +37,7 @@ To mount Azure NetApp File volume on Azure VM,
 sudo apt-get install nfs-common
 
 # Check "mount path" in the portal and mount volume (e.g. when the mount path is "10.10.2.4:/mynfsvolumea")
-sudo mount -t nfs -o rw,hard,rsize=1048576,wsize=1048576,sec=sys,vers=4.1,tcp 10.10.2.4:/mynfsvolume nfsvolume  
+sudo mount -t nfs -o rw,hard,rsize=65536,wsize=65536,sec=sys,vers=4.1,tcp 10.10.2.4:/mynfsvolume nfsvolume  
 
 ```
 
