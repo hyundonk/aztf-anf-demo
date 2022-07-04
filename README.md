@@ -230,6 +230,53 @@ Latency - Random Read
 ![image-20210827110150785](README.assets/image-20210827110150785.png)
 
 
+## Using RHEL8.4
+
+```
+sudo yum install -y git
+sudo yum install -y nfs-utils
+sudo yum -y install fio
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m pip install --upgrade Pillow
+
+git clone -b v.1.0.10 https://github.com/louwrentius/fio-plot.git
+cd fio-plot/benchmark_script/
+sudo pip3 install -r requirements.txt
+
+# In case of ANF
+sudo mkdir /nfsvolume
+sudo mount -t nfs -o rw,hard,rsize=65536,wsize=65536,sec=sys,vers=4.1,tcp 10.10.2.4:/mynfsvolume2 /nfsvolume -o nconnect=8
+sudo chmod a+wrx /nfsvolume/
+
+./bench_fio -d /nfsvolume -t directory -s 4g --mode randread -o ./benchmarks_anf_ultra_nconnect8 --iodepth 64 --numjobs 4 --block-size 4k --extra-opts fallocate=none
+./bench_fio -d /nfsvolume -t directory -s 4g --mode randwrite -o ./benchmarks_anf_ultra_nconnect8 --iodepth 64 --numjobs 4 --block-size 4k --extra-opts fallocate=none
+
+cd ../fio_plot/
+sudo pip3 install -r requirements.txt
+./fio_plot -i ../benchmark_script/benchmarks_anf_ultra_nconnect8/nfsvolume/4k/ -T "IOPS-randread-64iodepth-4jobs-ANF-ultra-nconnect8" -g -t iops -r randread -d 64 -n 4 --xlabel-parent 2
+./fio_plot -i ../benchmark_script/benchmarks_anf_ultra_nconnect8/nfsvolume/4k/ -T "latency-randread-64iodepth-4jobs-ANF-ultra-nconnect8" -g -t lat -r randread -d 64 -n 4 --xlabel-parent 2
+./fio_plot -i ../benchmark_script/benchmarks_anf_ultra_nconnect8/nfsvolume/4k/ -T "bw-randread-64iodepth-4jobs-ANF-ultra-nconnect8" -g -t bw -r randread -d 64 -n 4 --xlabel-parent 2
+
+sudo umount /nfsvolume/
+
+# In case of managed disk
+sudo parted /dev/sdc --script mklabel gpt mkpart xfspart xfs 0% 100%
+sudo mkfs.xfs /dev/sdc1
+sudo partprobe /dev/sdc1
+sudo mkdir /datadrive
+sudo mount /dev/sdc1 /datadrive
+
+./bench_fio -d /ultradisk/ -t directory -s 4g --mode randread -o ./benchmark_ultradisk --iodepth 64 --numjobs 4 --block-size 4k --extra-opts fallocate=none
+
+cd ../fio_plot/
+sudo pip3 install -r requirements.txt
+./fio_plot -i ../benchmark_script/benchmark_ultradisk/4k/ -T "IOPS-randread-64iodepth-4jobs-ultradisk" -g -t iops -r randread -d 64 -n 4 --xlabel-parent 2
+./fio_plot -i ../benchmark_script/benchmark_ultradisk/4k/ -T "latency-randread-64iodepth-4jobs-ultradisk" -g -t lat -r randread -d 64 -n 4 --xlabel-parent 2
+./fio_plot -i ../benchmark_script/benchmark_ultradisk/ultradisk/4k/ -T "bw-randread-64iodepth-4jobs-ultradisk" -g -t bw -r randread -d 64 -n 4 --xlabel-parent 2
+
+```
+
+
 
 ## Summary
 
